@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "ES2018",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "incremental": true,
+    "allowUnreachableCode": false,
+    "resolveJsonModule": true,
+    "lib": [
+      "ES2018"
+    ],
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    },
+    "types": ["jest", "node"],
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
+
