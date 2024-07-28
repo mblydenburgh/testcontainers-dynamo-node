@@ -5,7 +5,7 @@ For more information on Testcontainers, see the [Testcontainers documentation](h
 
 ## Usage
 ```typescript
-import { DynamoContainer, StartedDynamoContainer, InitialStructure } from '../src/DynamoContainer'
+import { DynamoContainer, StartedDynamoContainer, InitialStructure } from 'testcontainers-dynamo-node'
 
 const initData: InitialStructure[] = [
   {
@@ -44,4 +44,5 @@ const initData: InitialStructure[] = [
 const container = await new DynamoContainer(initData).start()
 await container.createDynamoClient().listTables() // { TableNames: ['foo-table'] }
 await container.createDocumentClient().scan({ TableName: 'foo-table' }) // { Items: [{ PK: '1', data: 'foo' }, { PK: '2', data: 'bar' }] }
+await container.setData() // reset to initial state or provide an override
 ```
