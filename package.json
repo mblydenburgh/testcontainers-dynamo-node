@@ -1,6 +1,6 @@
 {
   "name": "testcontainers-dynamo-node",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "Michael Blydenburgh",
   "description": "A NodeJS implementation of DynamoDB for Testcontainers",
   "repository": {
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "@types/lodash.chunk": "^4.2.9",
+    "@types/lodash.compact": "^3.0.1",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^7.32.0",
@@ -42,6 +43,7 @@
     "@aws-sdk/client-dynamodb": "^3.614.0",
     "@aws-sdk/lib-dynamodb": "^3.614.0",
     "lodash.chunk": "^4.2.0",
+    "lodash.compact": "^3.0.1",
     "testcontainers": "^10.10.3"
   }
 }
