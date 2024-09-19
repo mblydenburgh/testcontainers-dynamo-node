@@ -115,14 +115,15 @@ export class StartedDynamoContainer extends AbstractStartedContainer {
     * This is intended to be used to create an InitialStructure to pass to setData when starting a test.
     * TableName is intended able to be overridden from the default template.json in order to support
     * setting table name dynamically with JEST_WORKER_ID or other means.
-    * @param TableName - The name of the table to create.
+    * @param TableName - The name of the table to create for the given test.
+    * @param templateTableName - If different than TableName, templateTableName is the name of the table as it appears in the template.json file.
     * @returns - An InitialStructure object to pass to setData.
     */
-  makeTestSchema(TableName: string): InitialStructure {
+  makeTestSchema(TableName: string, templateName = "template.json", templateTableName?: string): InitialStructure {
     return {
       table: {
         TableName,
-        ...this.parseTemplateJson(TableName)
+        ...this.parseTemplateJson(templateTableName ? templateTableName : TableName, templateName)
       }
     }
   }
