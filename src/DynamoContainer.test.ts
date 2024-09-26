@@ -1,4 +1,5 @@
 import { DynamoContainer, StartedDynamoContainer, InitialStructure } from '../src/DynamoContainer'
+import { setData } from './utils'
 
 const initDataTest: InitialStructure[] = [
   {
@@ -61,7 +62,7 @@ describe('DynamoContainer tests', () => {
   let container: StartedDynamoContainer
 
   afterEach(async() => {
-    await container.setData()
+    await setData(container.createDynamoClient(), container.createDocumentClient(), [])
   })
 
   afterAll(async() => {
@@ -93,7 +94,7 @@ describe('DynamoContainer tests', () => {
   it('be able to override a started container with data', async() => {
     const dynamoClient = container.createDynamoClient()
     const dynamoDocumentClient = container.createDocumentClient()
-    await container.setData(initDataTest)
+    await setData(dynamoClient, dynamoDocumentClient, initDataTest)
 
     const tables = await dynamoClient.listTables()
     const newTableData = await dynamoDocumentClient.scan({ TableName: 'newTable' })
