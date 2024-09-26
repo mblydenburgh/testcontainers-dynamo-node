@@ -89,3 +89,28 @@ import * as ddblib from '@aws-sdk/lib-dynamodb'
       }
     }
   }
+
+  /**
+    * For use in the case if you are using some sort of global test setup you may not have access to the StartedDynamoContainer
+    * but would like to create a DynamoDB client to interact with the local dynamo instance.
+    */
+  export function createDynamoClient(port: number): DynamoDB {
+    const endpoint = `http://localhost:${port}`
+    const config = {
+      endpoint,
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'dummy',
+        secretAccessKey: 'dummy'
+      }
+    }
+    return new DynamoDB(config)
+  }
+
+  /**
+    * For use in the case if you are using some sort of global test setup you may not have access to the StartedDynamoContainer
+    * but would like to create a DynamoDB client to interact with the local dynamo instance.
+    */
+  export function createDocumentClient(client: DynamoDB): ddblib.DynamoDBDocument {
+    return ddblib.DynamoDBDocument.from(client)
+  }
