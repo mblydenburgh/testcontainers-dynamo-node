@@ -48,10 +48,11 @@ export class StartedDynamoContainer extends AbstractStartedContainer {
   private readonly port: number
   constructor(
     private readonly container: StartedTestContainer,
-    private readonly initial: Array<InitialStructure>
+    private readonly initial: Array<InitialStructure>,
+    port?: number
   ) {
     super(container)
-    this.port = container.getMappedPort(DynamoContainer.INTERNAL_PORT)
+    this.port = port ? port : container.getMappedPort(DynamoContainer.INTERNAL_PORT)
   }
 
   getPort(): number {
