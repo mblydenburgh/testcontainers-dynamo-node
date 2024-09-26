@@ -19,7 +19,7 @@ export interface InitialStructure {
 export class DynamoContainer extends GenericContainer {
   public static readonly INTERNAL_PORT = 8000
 
-  constructor(private readonly initStructure: InitialStructure[] = []) {
+  constructor(private readonly initStructure: InitialStructure[] = [], private port?: number) {
     super('amazon/dynamodb-local')
     this.withExposedPorts(DynamoContainer.INTERNAL_PORT).withWaitStrategy(Wait.forListeningPorts())
   }
@@ -28,7 +28,7 @@ export class DynamoContainer extends GenericContainer {
     try {
       const testContainer = await super.start()
       const init = this.initStructure
-      const startedContainer = new StartedDynamoContainer(testContainer, init)
+      const startedContainer = new StartedDynamoContainer(testContainer, init, this.port)
       await startedContainer.setData()
 
       return startedContainer
