@@ -1,6 +1,6 @@
 {
   "name": "testcontainers-dynamo-node",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "Michael Blydenburgh",
   "description": "A NodeJS implementation of DynamoDB for Testcontainers",
   "repository": {
