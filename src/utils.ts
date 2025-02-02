@@ -3,6 +3,7 @@ import chunk from 'lodash.chunk'
 import { InitialStructure } from './DynamoContainer'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import * as ddblib from '@aws-sdk/lib-dynamodb'
+import path from 'path'
 
 /**
     * This is intended to be used to parse the output of cdk synth in order to provide a table schema
@@ -13,7 +14,8 @@ import * as ddblib from '@aws-sdk/lib-dynamodb'
     *  @returns - An array of dynamo table definitions
     */
 export function parseTemplateJson(tableName: string, templateName = 'template.json') {
-  const file = fs.readFileSync(templateName, 'utf8')
+  const cwd = process.cwd()
+  const file = fs.readFileSync(path.join(cwd, templateName), 'utf8')
   // this is needed since non-json is getting injected by bamboo in ci/cd
   const strippedContents = file.slice(file.indexOf('{'))
   const template = JSON.parse(strippedContents)
