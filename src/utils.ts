@@ -14,31 +14,34 @@ import path from 'path'
     *  @returns - An array of dynamo table definitions
     */
 export function parseTemplateJson(tableName: string, templateName = 'template.json') {
-  const cwd = process.cwd()
-  const file = fs.readFileSync(path.join(cwd, templateName), 'utf8')
-  // this is needed since non-json is getting injected by bamboo in ci/cd
-  const strippedContents = file.slice(file.indexOf('{'))
-  const template = JSON.parse(strippedContents)
-  const tables = Object.keys(template['Resources'])
-    .filter((key) => {
-      const resource = template['Resources'][key]
+  if (process.env.JEST_WORKER_ID) {
+    const cwd = process.cwd()
+    const file = fs.readFileSync(path.join(cwd, templateName), 'utf8')
+    // this is needed since non-json is getting injected by bamboo in ci/cd
+    const strippedContents = file.slice(file.indexOf('{'))
+      const template = JSON.parse(strippedContents)
+      const tables = Object.keys(template['Resources'])
+      .filter((key) => {
+        const resource = template['Resources'][key]
 
-      return resource['Type'] === 'AWS::DynamoDB::GlobalTable'
-    })
-    .map((key) => {
-      const resource = template['Resources'][key]
-      if (resource['Type'] == 'AWS::DynamoDB::GlobalTable' && resource['Properties']['TableName'] === tableName) {
-        const properties = resource['Properties']
-        // Need to remove, not on CreateTableInput
-        delete properties['SSESpecification']
-        delete properties['StreamSpecification']
-        delete properties['Replicas']
+        return resource['Type'] === 'AWS::DynamoDB::GlobalTable'
+      })
+      .map((key) => {
+        const resource = template['Resources'][key]
+        if (resource['Type'] == 'AWS::DynamoDB::GlobalTable' && resource['Properties']['TableName'] === tableName) {
+          const properties = resource['Properties']
+          // Need to remove, not on CreateTableInput
+          delete properties['SSESpecification']
+          delete properties['StreamSpecification']
+          delete properties['Replicas']
 
-        return properties
-      }
-    })
+          return properties
+        }
+      })
 
-  return tables[0]
+      return tables[0]
+  }
+  return undefined
 }
 
 /**
