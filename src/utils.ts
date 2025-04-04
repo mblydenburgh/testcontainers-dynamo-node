@@ -1,9 +1,9 @@
-import * as fs from 'fs'
-import chunk from 'lodash.chunk'
-import { InitialStructure } from './DynamoContainer'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import * as ddblib from '@aws-sdk/lib-dynamodb'
-import path from 'path'
+import * as fs from "fs"
+import chunk from "lodash.chunk"
+import { InitialStructure } from "./DynamoContainer"
+import { DynamoDB } from "@aws-sdk/client-dynamodb"
+import * as ddblib from "@aws-sdk/lib-dynamodb"
+import path from "path"
 
 /**
     * This is intended to be used to parse the output of cdk synth in order to provide a table schema
@@ -13,34 +13,38 @@ import path from 'path'
     *  @param templateName - The name of the template file to parse. Defaults to "template.json".
     *  @returns - An array of dynamo table definitions
     */
-export function parseTemplateJson(tableName: string, templateName = 'template.json') {
+export function parseTemplateJson(tableName: string, templateName = "template.json") {
   if (process.env.JEST_WORKER_ID) {
     const cwd = process.cwd()
-    const file = fs.readFileSync(path.join(cwd, templateName), 'utf8')
-    // this is needed since non-json is getting injected by bamboo in ci/cd
-    const strippedContents = file.slice(file.indexOf('{'))
-      const template = JSON.parse(strippedContents)
-      const tables = Object.keys(template['Resources'])
+    const file = fs.readFileSync(path.join(cwd, templateName), "utf8")
+    // this is needed since non-json is getting injected in some ci/cd contexts
+    const strippedContents = file.slice(file.indexOf("{"))
+    const template = JSON.parse(strippedContents)
+    const tables = Object.keys(template["Resources"])
       .filter((key) => {
-        const resource = template['Resources'][key]
+        const resource = template["Resources"][key]
 
-        return resource['Type'] === 'AWS::DynamoDB::GlobalTable'
+        return ["AWS::DynamoDB::GlobalTable", "AWS::DynamoDB::Table"].includes(resource["Type"])
       })
       .map((key) => {
-        const resource = template['Resources'][key]
-        if (resource['Type'] == 'AWS::DynamoDB::GlobalTable' && resource['Properties']['TableName'] === tableName) {
-          const properties = resource['Properties']
+        const resource = template["Resources"][key]
+        if (
+          ["AWS::DynamoDB::GlobalTable", "AWS::DynamoDB::Table"].includes(resource["Type"]) &&
+          resource["Properties"]["TableName"] === tableName
+        ) {
+          const properties = resource["Properties"]
           // Need to remove, not on CreateTableInput
-          delete properties['SSESpecification']
-          delete properties['StreamSpecification']
-          delete properties['Replicas']
+          delete properties["SSESpecification"]
+          delete properties["StreamSpecification"]
+          delete properties["Replicas"]
 
           return properties
         }
       })
 
-      return tables[0]
+    return tables[0]
   }
+
   return undefined
 }
 
@@ -49,14 +53,19 @@ export function parseTemplateJson(tableName: string, templateName = 'template.js
     * TableName is intended able to be overridden from the default template.json in order to support
     * setting table name dynamically with JEST_WORKER_ID or other means.
     * @param TableName - The name of the table to create for the given test.
-    * @param templateTableName - If different than TableName, templateTableName is the name of the table as it appears in the template.json file.
+    * @param templateTableName - If different than th input TableName,
+    * templateTableName is the name of the table as it appears in the template.json file.
     * @returns - An InitialStructure object to pass to setData.
     */
-export function makeTestSchema(TableName: string, templateName = 'template.json', templateTableName?: string): InitialStructure {
+export function makeTestSchema(
+  TableName: string,
+  templateName = "template.json",
+  templateTableName?: string,
+): InitialStructure {
   return {
     table: {
-      TableName,
       ...parseTemplateJson(templateTableName ? templateTableName : TableName, templateName),
+      TableName,
     },
   }
 }
@@ -65,9 +74,15 @@ export function makeTestSchema(TableName: string, templateName = 'template.json'
     * Sets the tables either with the initial data provided to the StartedDynamoContainer or
     * with optional override data.
     * @param input - Optional override data to initialize the tables with.
-    * @param tablePrefix - Optional, this is used to ensure that unrelated tests do not delete tables used by other tests to handle tests running in parallel.
+    * @param tablePrefix - Optional, this is used to ensure that unrelated tests do not delete tables
+    * used by other tests to handle tests running in parallel.
     */
-export async function setData(ddbClient: DynamoDB, docClient: ddblib.DynamoDBDocument, input: Array<InitialStructure>, tablePrefix?: string): Promise<void> {
+export async function setData(
+  ddbClient: DynamoDB,
+  docClient: ddblib.DynamoDBDocument,
+  input: Array<InitialStructure>,
+  tablePrefix?: string,
+): Promise<void> {
   // delete any tables that exist
   const { TableNames } = await ddbClient.listTables()
   if (TableNames && TableNames.length > 0) {
@@ -85,7 +100,7 @@ export async function setData(ddbClient: DynamoDB, docClient: ddblib.DynamoDBDoc
   for (const tableSchema of data) {
     await ddbClient.createTable(tableSchema.table)
     if (tableSchema.items && tableSchema.items.length > 0) {
-      const tableName = tableSchema.table.TableName || 'table'
+      const tableName = tableSchema.table.TableName || "table"
       const items = tableSchema.items.map((x) => ({ PutRequest: { Item: x } }))
 
       await Promise.all(
@@ -103,17 +118,18 @@ export async function setData(ddbClient: DynamoDB, docClient: ddblib.DynamoDBDoc
 }
 
 /**
-    * For use in the case if you are using some sort of global test setup you may not have access to the StartedDynamoContainer
+    * For use in the case if you are using some sort of global test setup you may not have
+    * access to the StartedDynamoContainer
     * but would like to create a DynamoDB client to interact with the local dynamo instance.
     */
 export function createDynamoClient(port: number): DynamoDB {
   const endpoint = `http://localhost:${port}`
   const config = {
     endpoint,
-    region: 'us-east-1',
+    region: "us-east-1",
     credentials: {
-      accessKeyId: 'dummy',
-      secretAccessKey: 'dummy',
+      accessKeyId: "dummy",
+      secretAccessKey: "dummy",
     },
   }
 
@@ -121,7 +137,8 @@ export function createDynamoClient(port: number): DynamoDB {
 }
 
 /**
-    * For use in the case if you are using some sort of global test setup you may not have access to the StartedDynamoContainer
+    * For use in the case if you are using some sort of global test setup you may not have
+    * access to the StartedDynamoContainer
     * but would like to create a DynamoDB client to interact with the local dynamo instance.
     */
 export function createDocumentClient(client: DynamoDB): ddblib.DynamoDBDocument {

@@ -1,15 +1,15 @@
 module.exports = {
-  roots: ['<rootDir>'],
-  verbose: true,
+  testMatch: ["**/*.test.ts"],
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
+    "^.+\\.ts$": "ts-jest",
   },
+  verbose: true,
   globals: {
-    'ts-jest': {
-      tsConfig: 'tsconfig.json',
+    "ts-jest": {
+      tsConfig: "tsconfig.json",
     },
   },
-  testEnvironment: 'node',
-  reporters: ['default'],
+  testEnvironment: "node",
+  reporters: ["default"],
 }
 

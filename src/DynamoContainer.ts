@@ -1,7 +1,14 @@
-import { AbstractStartedContainer, GenericContainer, StartedTestContainer, StopOptions, StoppedTestContainer, Wait } from 'testcontainers'
-import * as dynamodb from '@aws-sdk/client-dynamodb'
-import * as ddblib from '@aws-sdk/lib-dynamodb'
-import { setData } from './utils'
+import {
+  AbstractStartedContainer,
+  GenericContainer,
+  StartedTestContainer,
+  StopOptions,
+  StoppedTestContainer,
+  Wait,
+} from "testcontainers"
+import * as dynamodb from "@aws-sdk/client-dynamodb"
+import * as ddblib from "@aws-sdk/lib-dynamodb"
+import { setData } from "./utils"
 
 /**
   * TableInitStructure is used to initialize the table with a given schema and seed data.
@@ -17,7 +24,11 @@ export interface InitialStructure {
 export class DynamoContainer extends GenericContainer {
   public static readonly INTERNAL_PORT = 8000
 
-  constructor(private readonly initStructure: InitialStructure[] = [], image = "amazon/dynamodb-local", private port?: number) {
+  constructor(
+    private readonly initStructure: InitialStructure[] = [],
+    image = "amazon/dynamodb-local",
+    private port?: number,
+  ) {
     super(image)
     this.withExposedPorts(DynamoContainer.INTERNAL_PORT).withWaitStrategy(Wait.forListeningPorts())
   }
@@ -31,7 +42,7 @@ export class DynamoContainer extends GenericContainer {
 
       return startedContainer
     } catch (e) {
-      console.error('error:', e)
+      console.error("error:", e)
       throw e
     }
   }
@@ -46,7 +57,7 @@ export class StartedDynamoContainer extends AbstractStartedContainer {
   private readonly port: number
   constructor(
     private readonly container: StartedTestContainer,
-    port?: number
+    port?: number,
   ) {
     super(container)
     this.port = port ? port : container.getMappedPort(DynamoContainer.INTERNAL_PORT)
@@ -68,19 +79,20 @@ export class StartedDynamoContainer extends AbstractStartedContainer {
     const endpoint = this.endpointUrl()
     const config = {
       endpoint,
-      region: 'us-east-1',
+      region: "us-east-1",
       credentials: {
-        accessKeyId: 'dummy',
-        secretAccessKey: 'dummy'
-      }
+        accessKeyId: "dummy",
+        secretAccessKey: "dummy",
+      },
     }
+
     return new dynamodb.DynamoDB(config)
   }
 
   createDocumentClient(): ddblib.DynamoDBDocument {
     const client = this.createDynamoClient()
+
     return ddblib.DynamoDBDocument.from(client)
   }
-
 }
 
