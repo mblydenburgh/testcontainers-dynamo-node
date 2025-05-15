@@ -18,7 +18,7 @@ export function parseTemplateJson(tableName: string, templateName = "template.js
     const cwd = process.cwd()
     const file = fs.readFileSync(path.join(cwd, templateName), "utf8")
     // this is needed since non-json is getting injected in some ci/cd contexts
-    const strippedContents = file.slice(file.indexOf("{"))
+    const strippedContents = file.slice(file.indexOf("{"), -1 * file.split("").reverse().join("").indexOf("}"))
     const template = JSON.parse(strippedContents)
     const tables = Object.keys(template["Resources"])
       .filter((key) => {
