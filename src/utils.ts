@@ -1,5 +1,6 @@
 import * as fs from "fs"
 import chunk from "lodash.chunk"
+import compact from "lodash.compact"
 import { InitialStructure } from "./DynamoContainer"
 import { DynamoDB } from "@aws-sdk/client-dynamodb"
 import * as ddblib from "@aws-sdk/lib-dynamodb"
@@ -42,7 +43,7 @@ export function parseTemplateJson(tableName: string, templateName = "template.js
         }
       })
 
-    return tables[0]
+    return compact(tables)[0]
   }
 
   return undefined
